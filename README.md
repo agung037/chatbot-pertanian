@@ -36,8 +36,8 @@ AgroBot is an AI-powered agricultural assistant designed to help farmers, agricu
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd chatbot
+git clone https://github.com/agung037/chatbot-pertanian.git
+cd chatbot-pertanian
 ```
 
 2. Create a virtual environment and activate it:
