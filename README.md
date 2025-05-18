@@ -36,8 +36,8 @@ AgroBot is an AI-powered agricultural assistant designed to help farmers, agricu
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd chatbot
+git clone https://github.com/agung037/chatbot-pertanian.git
+cd chatbot-pertanian
 ```
 
 2. Create a virtual environment and activate it:
@@ -48,17 +48,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 3. Install the required packages:
 ```bash
+cd backend
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the root directory and add your Groq API key:
+4. Create a `.env` file in the backend directory and add your Groq API key:
 ```
 GROQ_API_KEY=your_api_key_here
 ```
 
 5. Start the Flask server:
 ```bash
-python backend/app.py
+python app.py
 ```
 
 6. Open `http://127.0.0.1` in your web browser or serve it using a local server.
