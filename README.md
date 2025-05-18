@@ -33,6 +33,8 @@ AgroBot is an AI-powered agricultural assistant designed to help farmers, agricu
 ### Frontend
 - HTML5, CSS3, JavaScript
 - TailwindCSS for styling
+- Webpack for bundling
+- jQuery for DOM manipulation
 - Responsive design across devices
 
 ### Backend
@@ -49,6 +51,7 @@ AgroBot is an AI-powered agricultural assistant designed to help farmers, agricu
 
 ### Prerequisites
 - Python 3.8+ installed
+- Node.js v16+ and npm v8+ (for frontend development)
 - API keys from Groq and HuggingFace
 - Git for cloning the repository
 
@@ -58,35 +61,59 @@ git clone https://github.com/agung037/chatbot-pertanian.git
 cd chatbot-pertanian
 ```
 
-### Step 2: Set Up Python Environment
+### Step 2: Backend Setup
+
+#### Set Up Python Environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-### Step 3: Install Dependencies
+#### Install Backend Dependencies
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure API Keys
+#### Configure API Keys
 Create a `.env` file in the backend directory with your API keys:
 ```
 GROQ_API_KEY=your_groq_api_key_here
 HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 ```
 
-### Step 5: Run the Application
+#### Run the Backend
 ```bash
 python app.py
 ```
+The Flask server will run at `http://127.0.0.1:5000`
 
-### Step 6: Access the Web Interface
-Open your browser and navigate to:
+### Step 3: Frontend Setup (for Development)
+
+#### Install Frontend Dependencies
+```bash
+cd frontend
+npm install
 ```
-http://127.0.0.1:5000
+
+#### Run Frontend Development Server
+```bash
+npm start
 ```
+This will start a development server at `http://localhost:9000` with hot reloading.
+
+#### Build Frontend for Production
+```bash
+npm run build
+```
+The built files will be in the `dist` directory.
+
+### Step 4: Access the Web Interface
+Using the pre-built frontend:
+- Open your browser and navigate to `http://127.0.0.1:5000`
+
+When using the frontend development server:
+- Open your browser and navigate to `http://localhost:9000`
 
 ## API Endpoints
 
@@ -126,6 +153,25 @@ http://127.0.0.1:5000
 - Ensure images are clear and well-lit for accurate detection
 - Make sure your API keys are correctly configured
 - Check that you're using a supported image format (JPG, PNG)
+- For frontend development issues, check the webpack.config.js and package.json for correct configurations
+
+## Project Structure
+```
+chatbot-pertanian/
+├── backend/
+│   ├── app.py                # Main Flask application
+│   ├── requirements.txt      # Python dependencies
+│   └── utils/                # Utility modules
+├── frontend/
+│   ├── src/                  # Source files
+│   │   ├── index.html        # Chat interface
+│   │   ├── dashboard.html    # Dashboard page
+│   │   ├── detection.html    # Disease detection page
+│   │   ├── forum.html        # Community forum
+│   │   └── ...
+│   └── package.json          # Frontend dependencies and scripts
+└── README.md                 # This file
+```
 
 ## Contributing
 
