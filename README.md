@@ -1,5 +1,9 @@
 # AgroBot - Agricultural Assistant
 
+## Demo
+![AgroBot Demo](demo.gif)
+
+
 AgroBot is an AI-powered agricultural assistant designed to help farmers, agricultural professionals, and farming enthusiasts with agricultural-related questions and plant disease detection.
 
 ## Features
