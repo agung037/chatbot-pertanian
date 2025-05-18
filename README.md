@@ -1,79 +1,131 @@
 # AgroBot - Agricultural Assistant
 
-![Demo](demo.gif)
-
-AgroBot is an AI-powered agricultural assistant designed to help farmers, agricultural professionals, and farming enthusiasts with their agricultural-related questions.
+AgroBot is an AI-powered agricultural assistant designed to help farmers, agricultural professionals, and farming enthusiasts with agricultural-related questions and plant disease detection.
 
 ## Features
 
-- Real-time chat interface with an AI assistant
-- Specialized in agricultural topics including:
-  - Plant care and cultivation techniques
-  - Pest and disease management
-  - Soil management and fertilization
-  - Best farming practices
-  - General agricultural advice
+### AI Chatbot Assistant
+- Real-time chat interface with an AI assistant specialized in agricultural topics
 - Persistent chat history using localStorage
-- Collapsible information panel
-- Responsive design
+- Responsive design for desktop and mobile devices
+
+### Tomato Disease Detection
+- Image-based disease detection using machine learning
+- Upload images via drag-and-drop or file selection
+- Detailed disease classification with confidence percentages
+- Disease information and treatment recommendations in English
+- **NEW:** Comprehensive disease information in Indonesian language using LLM
+
+### Forum Discussions
+- Community forum for agricultural discussions
+- Ask questions and share knowledge with other farmers
+
+### Knowledge Base
+- Dashboard with agricultural information and best practices
+- Searchable resources for common farming issues
 
 ## Tech Stack
 
 ### Frontend
-- HTML5
-- CSS3
-- JavaScript
-- jQuery & jQuery UI
-- Poppins font family
+- HTML5, CSS3, JavaScript
+- TailwindCSS for styling
+- Responsive design across devices
 
 ### Backend
-- Python
-- Flask
-- Flask-CORS
-- Groq API (Llama3-8b-8192 model)
+- Python with Flask web framework
+- RESTful API with Flask-RESTX and Swagger documentation
+- CORS support for cross-origin requests
 
-## Setup
+### AI and Machine Learning
+- Groq API integration with Llama3-8b-8192 model for chatbot
+- HuggingFace API for disease detection (MobileNet model)
+- LLM-generated content in multiple languages
 
-1. Clone the repository:
+## Installation and Setup
+
+### Prerequisites
+- Python 3.8+ installed
+- API keys from Groq and HuggingFace
+- Git for cloning the repository
+
+### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/agung037/chatbot-pertanian.git
 cd chatbot-pertanian
 ```
 
-2. Create a virtual environment and activate it:
+### Step 2: Set Up Python Environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install the required packages:
+### Step 3: Install Dependencies
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the backend directory and add your Groq API key:
+### Step 4: Configure API Keys
+Create a `.env` file in the backend directory with your API keys:
 ```
-GROQ_API_KEY=your_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 ```
 
-5. Start the Flask server:
+### Step 5: Run the Application
 ```bash
 python app.py
 ```
 
-6. Open `http://127.0.0.1` in your web browser or serve it using a local server.
-
+### Step 6: Access the Web Interface
+Open your browser and navigate to:
+```
+http://127.0.0.1:5000
+```
 
 ## API Endpoints
 
+### Chat Endpoints
 - `POST /chat`: Send messages to the AI assistant
-  - Request body: `{ "message": "your question here" }`
+  - Request: `{ "message": "your question here" }`
   - Response: `{ "response": "AI assistant's answer" }`
+
+### Disease Detection Endpoints
+- `POST /detect-disease`: Detect diseases in plant images
+  - Request: `{ "image": "base64_encoded_image", "requestLlmInfo": true }`
+  - Response: Contains disease prediction, confidence score, and LLM-generated information
+
+### Other Endpoints
+- `GET /test`: Test if the API is running
+- Swagger UI available at `/docs` for interactive API documentation
+
+## Usage Instructions
+
+### Chatbot Assistant
+1. Navigate to the AI Assistant page
+2. Type your agricultural question in the chat input
+3. Receive expert advice in Indonesian language
+
+### Disease Detection
+1. Go to the Disease Detection page
+2. Upload a tomato leaf image
+3. Click "Detect Disease"
+4. View the classification results with confidence scores
+5. Read detailed information about the disease, including:
+   - English description and treatment options
+   - Comprehensive Indonesian information about symptoms, causes, and treatments
+
+## Troubleshooting
+
+- If you see a "Model is loading" message, wait a few seconds and try again
+- Ensure images are clear and well-lit for accurate detection
+- Make sure your API keys are correctly configured
+- Check that you're using a supported image format (JPG, PNG)
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
+Contributions are welcome! Feel free to submit issues and pull requests.
 
 ## License
 
