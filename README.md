@@ -1,5 +1,7 @@
 # AgroBot - Agricultural Assistant
 
+![Demo](demo.gif)
+
 AgroBot is an AI-powered agricultural assistant designed to help farmers, agricultural professionals, and farming enthusiasts with their agricultural-related questions.
 
 ## Features
@@ -59,20 +61,8 @@ GROQ_API_KEY=your_api_key_here
 python backend/app.py
 ```
 
-6. Open `frontend/index.html` in your web browser or serve it using a local server.
+6. Open `http://127.0.0.1` in your web browser or serve it using a local server.
 
-## Project Structure
-
-```
-chatbot/
-├── backend/
-│   └── app.py
-├── frontend/
-│   └── index.html
-├── .env
-├── requirements.txt
-└── README.md
-```
 
 ## API Endpoints
 
@@ -86,4 +76,4 @@ Feel free to submit issues and enhancement requests!
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
