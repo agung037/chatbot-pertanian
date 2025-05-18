@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroBot - Agricultural Forum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+<body class="bg-agrobot-bg font-poppins flex">
+    <!-- Left Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-4 h-screen">
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">AgroBot</h2>
+            <nav>
+                <ul>
+                    <li class="mb-2">
+                        <a href="dashboard.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="detection.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                            Detection Disease
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="forum.html" class="flex items-center px-4 py-2 text-blue-600 bg-blue-50 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                            </svg>
+                            Forum
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="index.html" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            AI Assistant Chat
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Agricultural Forum</h1>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                Create New Topic
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Crop Cultivation</h2>
+                    <span class="text-sm text-gray-500">12 Topics</span>
+                </div>
+                <ul class="space-y-3">
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Best Practices for Rice Farming</a>
+                        <span class="text-sm text-gray-500">5 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Organic Vegetable Gardening</a>
+                        <span class="text-sm text-gray-500">8 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Sustainable Farming Techniques</a>
+                        <span class="text-sm text-gray-500">12 replies</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Pest Management</h2>
+                    <span class="text-sm text-gray-500">9 Topics</span>
+                </div>
+                <ul class="space-y-3">
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Natural Pest Control Methods</a>
+                        <span class="text-sm text-gray-500">7 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Identifying Common Crop Pests</a>
+                        <span class="text-sm text-gray-500">15 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Integrated Pest Management</a>
+                        <span class="text-sm text-gray-500">10 replies</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Agricultural Technology</h2>
+                    <span class="text-sm text-gray-500">7 Topics</span>
+                </div>
+                <ul class="space-y-3">
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">IoT in Agriculture</a>
+                        <span class="text-sm text-gray-500">6 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">Drone Technology in Farming</a>
+                        <span class="text-sm text-gray-500">9 replies</span>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <a href="#" class="text-blue-600 hover:underline">AI in Agriculture</a>
+                        <span class="text-sm text-gray-500">11 replies</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Recent Discussions</h2>
+            <div class="space-y-4">
+                <div class="border-b pb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <a href="#" class="text-lg font-medium text-blue-600 hover:underline">Improving Soil Fertility Naturally</a>
+                        <span class="text-sm text-gray-500">Posted by @AgriExpert</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Discussing organic methods to enhance soil nutrients without chemical fertilizers...</p>
+                </div>
+                <div class="border-b pb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <a href="#" class="text-lg font-medium text-blue-600 hover:underline">Climate Change Impact on Agriculture</a>
+                        <span class="text-sm text-gray-500">Posted by @ClimateAgri</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Exploring adaptive strategies for farmers facing changing climate conditions...</p>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <a href="#" class="text-lg font-medium text-blue-600 hover:underline">Smart Irrigation Techniques</a>
+                        <span class="text-sm text-gray-500">Posted by @WaterWise</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Sharing innovative water conservation methods in agricultural irrigation...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -3,3 +3,6 @@ python-dotenv>=0.19
 requests>=2.25
 Flask-CORS>=3.0
 groq>=0.4.0
+Pillow>=9.0.0
+flask-restx>=1.1.0
+# base64 is included in Python's standard library
