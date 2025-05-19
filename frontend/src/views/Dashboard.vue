@@ -1,0 +1,118 @@
+<template>
+  <div class="p-8">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800 dark:text-white">Dashboard</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Agricultural Insights Cards -->
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Crop Health</h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400">Overall crop health: Good</p>
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Soil Moisture</h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 7.777 16.656 10.657c.563 2.88-.002 5.346-1.346 7.657z" />
+          </svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400">Current moisture level: 65%</p>
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 65%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Pest Risk</h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400">Current risk level: Moderate</p>
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="bg-yellow-600 h-2.5 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Yield Prediction</h2>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400">Estimated yield: 85 tons/hectare</p>
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+            <div class="bg-purple-600 h-2.5 rounded-full" style="width: 75%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Activities</h2>
+        <ul class="space-y-3">
+          <li class="flex items-center">
+            <span class="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
+            <span class="text-gray-600 dark:text-gray-300">Soil fertilization completed</span>
+          </li>
+          <li class="flex items-center">
+            <span class="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
+            <span class="text-gray-600 dark:text-gray-300">Irrigation system checked</span>
+          </li>
+          <li class="flex items-center">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></span>
+            <span class="text-gray-600 dark:text-gray-300">Pest monitoring initiated</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Upcoming Tasks</h2>
+        <ul class="space-y-3">
+          <li class="flex items-center justify-between">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-gray-600 dark:text-gray-300">Crop Rotation Planning</span>
+            </div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">Next Week</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 01-4.176-3.97L9.22 7.666a1 1 0 00-.853-.706l-1.285-.193a1 1 0 00-1.145.817l-.767 5.378a1 1 0 00.965 1.138h.908a1 1 0 00.99-.858l.567-4.055a6.067 6.067 0 012.328 3.123l.728 2.768a1 1 0 00.553.662l2.527 1.23a1 1 0 001.412-.522l1.014-2.477a1 1 0 00-.1-.894z" />
+              </svg>
+              <span class="text-gray-600 dark:text-gray-300">Fertilizer Application</span>
+            </div>
+            <span class="text-sm text-gray-500 dark:text-gray-400">In 2 Weeks</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Dashboard'
+}
+</script> 
