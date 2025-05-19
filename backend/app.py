@@ -30,13 +30,7 @@ app = Flask(__name__, template_folder='../frontend', static_folder='../frontend'
 api.init_app(app)
 
 # Configure CORS
-CORS(app, resources={
-    r"/api/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]},
-    r"/docs": {"origins": "*"},
-    r"/swagger.json": {"origins": "*"},
-    r"/chat": {"origins": "*", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type"]},
-    r"/detect-disease": {"origins": "*", "methods": ["POST", "OPTIONS"], "allow_headers": ["Content-Type"]}
-})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Get API keys from environment variables
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
