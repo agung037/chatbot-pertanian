@@ -111,7 +111,7 @@ The frontend uses HTML, CSS (TailwindCSS), and JavaScript:
    npm run dev
    ```
 
-3. Open your browser and navigate to `http://localhost:9000`
+3. Open your browser and navigate to `http://localhost:9001`
 
 ## API Endpoints
 
