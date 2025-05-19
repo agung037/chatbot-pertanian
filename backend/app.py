@@ -4,6 +4,10 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from groq import Groq
 import logging
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+import io
 
 # Import utility modules
 from utils.image_processing import process_image_data, detect_image_format
@@ -14,6 +18,11 @@ from utils.swagger import api, chat_ns, disease_ns, general_ns
 from utils.swagger import (chat_request, chat_response, error_response, 
                          disease_response, loading_response, test_response,
                          image_parser, json_parser)
+from utils.model_prediction import (
+    load_disease_detection_model, 
+    preprocess_image, 
+    predict_tomato_disease
+)
 from flask_restx import Resource
 
 # Load environment variables
@@ -49,6 +58,99 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize Groq client: {e}")
     groq_client = None
+
+# Load the local model
+try:
+    model_path = os.path.join(os.path.dirname(__file__), 'models', 'plant_disease_model.h5')
+    model = tf.keras.models.load_model(model_path)
+    # Log model output shape
+    output_shape = model.output_shape
+    logger.info(f"Model loaded successfully. Output shape: {output_shape}")
+except Exception as e:
+    logger.error(f"Failed to load local model: {e}")
+    model = None
+
+def preprocess_image(image_bytes):
+    """Preprocess image for model input"""
+    try:
+        # Convert bytes to PIL Image
+        image = Image.open(io.BytesIO(image_bytes))
+        
+        # Convert RGBA to RGB if necessary
+        if image.mode == 'RGBA':
+            image = image.convert('RGB')
+        
+        # Resize image to model's expected input size (224x224)
+        image = image.resize((224, 224))
+        
+        # Convert to numpy array and normalize
+        image_array = np.array(image) / 255.0
+        
+        # Add batch dimension
+        image_array = np.expand_dims(image_array, axis=0)
+        
+        return image_array
+    except Exception as e:
+        logger.error(f"Error preprocessing image: {e}")
+        raise ValueError(f"Failed to preprocess image: {str(e)}")
+
+def predict_disease(image_array):
+    """Make prediction using the local model"""
+    try:
+        predictions = model.predict(image_array)
+        # Log prediction shape and values
+        logger.info(f"Prediction shape: {predictions.shape}")
+        logger.info(f"Prediction values: {predictions[0]}")
+        
+        # Get the predicted class index
+        predicted_class = np.argmax(predictions[0])
+        # Get the confidence score
+        confidence = float(predictions[0][predicted_class])
+        
+        logger.info(f"Predicted class index: {predicted_class}, Confidence: {confidence}")
+        return predicted_class, confidence
+    except Exception as e:
+        logger.error(f"Error making prediction: {e}")
+        raise ValueError(f"Failed to make prediction: {str(e)}")
+
+# Define class names for tomato diseases
+TOMATO_DISEASE_CLASSES = [
+    "Tomato___Bacterial_spot",
+    "Tomato___Early_blight",
+    "Tomato___Late_blight",
+    "Tomato___Leaf_Mold",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___Spider_mites Two-spotted_spider_mite",
+    "Tomato___Target_Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+    "Tomato___Tomato_mosaic_virus",
+    "Tomato___healthy"
+]
+
+# Map model output indices to tomato class indices
+TOMATO_CLASS_MAPPING = {
+    15: 0,  # Tomato___Bacterial_spot
+    16: 1,  # Tomato___Early_blight
+    17: 2,  # Tomato___Late_blight
+    18: 3,  # Tomato___Leaf_Mold
+    19: 4,  # Tomato___Septoria_leaf_spot
+    20: 5,  # Tomato___Spider_mites
+    21: 6,  # Tomato___Target_Spot
+    22: 7,  # Tomato___Tomato_Yellow_Leaf_Curl_Virus
+    23: 8,  # Tomato___Tomato_mosaic_virus
+    24: 9,  # Tomato___healthy
+    25: 0,  # Additional tomato classes that might be mapped to the same diseases
+    26: 1,
+    27: 2,
+    28: 3,
+    29: 4,
+    30: 5,
+    31: 6,
+    32: 7,
+    33: 8,
+    34: 9,
+    36: 9
+}
 
 # Routes
 @app.route('/')
@@ -120,14 +222,14 @@ class DiseaseDetectionAPI(Resource):
     @disease_ns.doc('detect_disease')
     @disease_ns.expect(json_parser)
     @disease_ns.response(200, 'Success', disease_response)
-    @disease_ns.response(202, 'Model Loading', loading_response)
     @disease_ns.response(400, 'Validation Error', error_response)
     @disease_ns.response(500, 'Server Error', error_response)
     def post(self):
-        """Detect diseases in tomato plant images (base64 encoded)"""
-        if not HUGGINGFACE_API_KEY:
-            logger.error("HuggingFace API Key not configured")
-            return {"error": "HuggingFace API Key not configured on server."}, 500
+        """Detect diseases in tomato plant images using local model"""
+        # Check if model is loaded
+        if not model:
+            logger.error("Disease detection model not loaded")
+            return {"error": "Disease detection model not available."}, 500
         
         try:
             # Process image from request
@@ -137,39 +239,26 @@ class DiseaseDetectionAPI(Resource):
                 logger.error(f"Error processing image: {img_err}")
                 return {"error": str(img_err)}, 400
             
-            # Call HuggingFace API
-            huggingface_url = "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
+            # Preprocess image for model input
+            image_array = preprocess_image(image_bytes)
             
-            # Set headers with content type
-            content_type = detect_image_format(image_bytes)
-            headers = {
-                "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
-                "Content-Type": content_type
-            }
+            # Predict tomato disease
+            predicted_class_name, confidence = predict_tomato_disease(model, image_array)
             
-            # Make API call
-            try:
-                response = call_huggingface_api(huggingface_url, headers, image_bytes)
-                result = parse_huggingface_response(response)
-                
-                # Check if model is loading
-                if isinstance(result, dict) and result.get("status") == "loading":
-                    return result, 202
-                    
-            except (ConnectionError, ValueError) as api_err:
-                return {"error": str(api_err)}, 500
+            # Handle prediction results
+            if not predicted_class_name:
+                return {"error": "Unable to classify the image. Please provide a clear tomato plant image."}, 400
             
-            # Filter for tomato-specific results if possible
-            if isinstance(result, list):
-                tomato_results = [item for item in result if item.get("label") and "tomato" in item.get("label", "").lower()]
-                if tomato_results:
-                    result = tomato_results
-                    logger.info(f"Filtered to {len(tomato_results)} tomato-specific results")
+            # Create result with the predicted class
+            result = [{
+                "label": predicted_class_name,
+                "score": confidence
+            }]
             
             # Add disease descriptions and treatments
             result = enrich_disease_data(result)
             
-            logger.info("Successfully processed disease detection")
+            logger.info(f"Successfully processed tomato disease detection: {predicted_class_name}")
             return {"prediction": result}
             
         except Exception as e:
@@ -181,14 +270,14 @@ class DiseaseDetectionFileAPI(Resource):
     @disease_ns.doc('detect_disease_file')
     @disease_ns.expect(image_parser)
     @disease_ns.response(200, 'Success', disease_response)
-    @disease_ns.response(202, 'Model Loading', loading_response)
     @disease_ns.response(400, 'Validation Error', error_response)
     @disease_ns.response(500, 'Server Error', error_response)
     def post(self):
-        """Detect diseases in tomato plant images (file upload)"""
-        if not HUGGINGFACE_API_KEY:
-            logger.error("HuggingFace API Key not configured")
-            return {"error": "HuggingFace API Key not configured on server."}, 500
+        """Detect diseases in tomato plant images using local model (file upload)"""
+        # Check if model is loaded
+        if not model:
+            logger.error("Disease detection model not loaded")
+            return {"error": "Disease detection model not available."}, 500
         
         try:
             # Process image from request
@@ -206,39 +295,26 @@ class DiseaseDetectionFileAPI(Resource):
                 logger.error(f"Error processing image file: {img_err}")
                 return {"error": str(img_err)}, 400
             
-            # Call HuggingFace API
-            huggingface_url = "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
+            # Preprocess image for model input
+            image_array = preprocess_image(image_bytes)
             
-            # Set headers with content type
-            content_type = detect_image_format(image_bytes)
-            headers = {
-                "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
-                "Content-Type": content_type
-            }
+            # Predict tomato disease
+            predicted_class_name, confidence = predict_tomato_disease(model, image_array)
             
-            # Make API call
-            try:
-                response = call_huggingface_api(huggingface_url, headers, image_bytes)
-                result = parse_huggingface_response(response)
-                
-                # Check if model is loading
-                if isinstance(result, dict) and result.get("status") == "loading":
-                    return result, 202
-                    
-            except (ConnectionError, ValueError) as api_err:
-                return {"error": str(api_err)}, 500
+            # Handle prediction results
+            if not predicted_class_name:
+                return {"error": "Unable to classify the image. Please provide a clear tomato plant image."}, 400
             
-            # Filter for tomato-specific results if possible
-            if isinstance(result, list):
-                tomato_results = [item for item in result if item.get("label") and "tomato" in item.get("label", "").lower()]
-                if tomato_results:
-                    result = tomato_results
-                    logger.info(f"Filtered to {len(tomato_results)} tomato-specific results")
+            # Create result with the predicted class
+            result = [{
+                "label": predicted_class_name,
+                "score": confidence
+            }]
             
             # Add disease descriptions and treatments
             result = enrich_disease_data(result)
             
-            logger.info("Successfully processed disease detection")
+            logger.info(f"Successfully processed tomato disease detection: {predicted_class_name}")
             return {"prediction": result}
             
         except Exception as e:
