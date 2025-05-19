@@ -2,7 +2,7 @@ import logging
 from groq import Groq
 from flask import current_app
 
-from utils.llm import create_chat_messages, create_disease_info_prompt
+from utils.llm import create_chat_messages, create_disease_info_prompt, create_disease_suggestion_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -104,4 +104,42 @@ class LLMService:
             
         except Exception as e:
             logger.error(f"Error generating disease info: {e}", exc_info=True)
+            raise
+            
+    def get_disease_suggestion(self, disease_name, language='id'):
+        """Get treatment suggestions for a disease from the LLM."""
+        if not self.is_available():
+            raise ValueError("LLM service is not available")
+        
+        if not disease_name:
+            raise ValueError("Disease name cannot be empty")
+        
+        try:
+            # Create the disease suggestion prompt
+            messages = create_disease_suggestion_prompt(disease_name, language)
+            
+            # Get the model settings from the app config
+            model = current_app.config.get('LLM_MODEL', 'llama3-8b-8192')
+            temperature = current_app.config.get('LLM_TEMPERATURE', 0.7)
+            max_tokens = current_app.config.get('LLM_MAX_TOKENS', 1500)
+            
+            # Send request to the LLM API
+            chat_completion = self.client.chat.completions.create(
+                messages=messages,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                top_p=1,
+                stop=None,
+                stream=False,
+            )
+            
+            # Extract the response
+            response = chat_completion.choices[0].message.content
+            logger.info(f"Generated treatment suggestion for {disease_name}: {response[:50]}...")
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error generating treatment suggestion: {e}", exc_info=True)
             raise 

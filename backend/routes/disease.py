@@ -124,6 +124,44 @@ def setup_swagger(state):
                     logger.error(f"Error in file detection: {e}", exc_info=True)
                     return {"error": "An error occurred processing your request"}, 500
         
+        @ns.route('/suggestion')
+        class DiseaseSuggestion(Resource):
+            @ns.doc('disease_suggestion')
+            @ns.expect(swagger_resources['parsers']['json_parser'])
+            @ns.response(200, 'Success')
+            @ns.response(400, 'Validation Error', swagger_resources['models']['error_response'])
+            @ns.response(503, 'Service Unavailable', swagger_resources['models']['error_response'])
+            def post(self):
+                """Get treatment suggestions for a detected disease"""
+                try:
+                    # Get LLM service from registry
+                    llm_service = service_registry.get_llm_service()
+                    
+                    # Check if the service is available
+                    if not llm_service.is_available():
+                        return {"error": "LLM service is not available"}, 503
+                    
+                    # Get the disease name
+                    data = request.json
+                    if not data or 'disease' not in data:
+                        return {"error": "Disease name is required"}, 400
+                        
+                    disease_name = data['disease']
+                    language = data.get('language', 'id')  # Default to Indonesian
+                    
+                    # Get treatment suggestions
+                    suggestion = llm_service.get_disease_suggestion(disease_name, language)
+                    
+                    return {"suggestion": suggestion}, 200
+                    
+                except ValueError as ve:
+                    logger.warning(f"Validation error in disease suggestion: {ve}")
+                    return {"error": str(ve)}, 400
+                    
+                except Exception as e:
+                    logger.error(f"Error getting disease suggestion: {e}", exc_info=True)
+                    return {"error": "An error occurred processing your request"}, 500
+        
         @ns.route('/health')
         class DiseaseHealth(Resource):
             @ns.doc('disease_health')

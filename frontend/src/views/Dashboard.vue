@@ -108,11 +108,87 @@
         </ul>
       </div>
     </div>
+    
+    <!-- Monthly Harvest Heatmap -->
+    <div class="mt-8 bg-white dark:bg-agrobot-dark-card rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Harvest Distribution by Month</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr>
+              <th class="py-2 text-left text-gray-600 dark:text-gray-300">Crop</th>
+              <th v-for="month in months" :key="month" class="py-2 text-center text-gray-600 dark:text-gray-300">{{ month }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(crop, index) in harvestData" :key="index" class="border-t border-gray-200 dark:border-gray-700">
+              <td class="py-3 text-gray-600 dark:text-gray-300">{{ crop.name }}</td>
+              <td v-for="(value, monthIndex) in crop.values" :key="monthIndex" class="py-2 px-1">
+                <div class="w-full h-8 rounded" 
+                     :style="{ backgroundColor: getHeatmapColor(value), opacity: 0.2 + (value / 100) * 0.8 }"
+                     :title="`${crop.name}: ${value} tons`">
+                  <div class="flex justify-center items-center h-full text-xs font-medium" 
+                       :class="value > 60 ? 'text-gray-800 dark:text-white' : 'text-gray-700 dark:text-gray-300'">
+                    {{ value }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-500 dark:text-gray-400">Low</span>
+          <div class="flex space-x-1">
+            <div class="w-4 h-4 rounded" style="background-color: #fee0d2;"></div>
+            <div class="w-4 h-4 rounded" style="background-color: #fc9272;"></div>
+            <div class="w-4 h-4 rounded" style="background-color: #de2d26;"></div>
+          </div>
+          <span class="text-sm text-gray-500 dark:text-gray-400">High</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Dashboard'
+  name: 'Dashboard',
+  data() {
+    return {
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      harvestData: [
+        {
+          name: 'Rice',
+          values: [10, 15, 35, 65, 80, 95, 75, 60, 45, 30, 20, 15]
+        },
+        {
+          name: 'Corn',
+          values: [5, 10, 25, 45, 75, 90, 85, 70, 45, 25, 15, 10]
+        },
+        {
+          name: 'Soybeans',
+          values: [30, 45, 65, 85, 95, 80, 60, 40, 35, 25, 20, 25]
+        },
+        {
+          name: 'Cassava',
+          values: [70, 80, 85, 75, 55, 40, 35, 30, 45, 60, 75, 65]
+        },
+        {
+          name: 'Chili',
+          values: [40, 50, 65, 80, 85, 75, 60, 45, 40, 35, 30, 35]
+        }
+      ]
+    }
+  },
+  methods: {
+    getHeatmapColor(value) {
+      // Tomato/red gradient for the heatmap
+      if (value < 30) return '#fee0d2';
+      if (value < 70) return '#fc9272';
+      return '#de2d26';
+    }
+  }
 }
 </script> 
