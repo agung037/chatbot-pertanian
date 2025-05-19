@@ -18,11 +18,7 @@ from utils.swagger import api, chat_ns, disease_ns, general_ns
 from utils.swagger import (chat_request, chat_response, error_response, 
                          disease_response, loading_response, test_response,
                          image_parser, json_parser)
-from utils.model_prediction import (
-    load_disease_detection_model, 
-    preprocess_image, 
-    predict_tomato_disease
-)
+from models.plant_disease_model import PlantDiseaseModel
 from flask_restx import Resource
 
 # Load environment variables
@@ -59,98 +55,14 @@ except Exception as e:
     logger.error(f"Failed to initialize Groq client: {e}")
     groq_client = None
 
-# Load the local model
+# Initialize the plant disease model
 try:
-    model_path = os.path.join(os.path.dirname(__file__), 'models', 'plant_disease_model.h5')
-    model = tf.keras.models.load_model(model_path)
-    # Log model output shape
-    output_shape = model.output_shape
-    logger.info(f"Model loaded successfully. Output shape: {output_shape}")
+    model_path = os.path.join(os.path.dirname(__file__), 'models', 'tomato_disease.h5')
+    plant_disease_model = PlantDiseaseModel(model_path)
+    logger.info("Plant disease model initialized successfully")
 except Exception as e:
-    logger.error(f"Failed to load local model: {e}")
-    model = None
-
-def preprocess_image(image_bytes):
-    """Preprocess image for model input"""
-    try:
-        # Convert bytes to PIL Image
-        image = Image.open(io.BytesIO(image_bytes))
-        
-        # Convert RGBA to RGB if necessary
-        if image.mode == 'RGBA':
-            image = image.convert('RGB')
-        
-        # Resize image to model's expected input size (224x224)
-        image = image.resize((224, 224))
-        
-        # Convert to numpy array and normalize
-        image_array = np.array(image) / 255.0
-        
-        # Add batch dimension
-        image_array = np.expand_dims(image_array, axis=0)
-        
-        return image_array
-    except Exception as e:
-        logger.error(f"Error preprocessing image: {e}")
-        raise ValueError(f"Failed to preprocess image: {str(e)}")
-
-def predict_disease(image_array):
-    """Make prediction using the local model"""
-    try:
-        predictions = model.predict(image_array)
-        # Log prediction shape and values
-        logger.info(f"Prediction shape: {predictions.shape}")
-        logger.info(f"Prediction values: {predictions[0]}")
-        
-        # Get the predicted class index
-        predicted_class = np.argmax(predictions[0])
-        # Get the confidence score
-        confidence = float(predictions[0][predicted_class])
-        
-        logger.info(f"Predicted class index: {predicted_class}, Confidence: {confidence}")
-        return predicted_class, confidence
-    except Exception as e:
-        logger.error(f"Error making prediction: {e}")
-        raise ValueError(f"Failed to make prediction: {str(e)}")
-
-# Define class names for tomato diseases
-TOMATO_DISEASE_CLASSES = [
-    "Tomato___Bacterial_spot",
-    "Tomato___Early_blight",
-    "Tomato___Late_blight",
-    "Tomato___Leaf_Mold",
-    "Tomato___Septoria_leaf_spot",
-    "Tomato___Spider_mites Two-spotted_spider_mite",
-    "Tomato___Target_Spot",
-    "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
-    "Tomato___Tomato_mosaic_virus",
-    "Tomato___healthy"
-]
-
-# Map model output indices to tomato class indices
-TOMATO_CLASS_MAPPING = {
-    15: 0,  # Tomato___Bacterial_spot
-    16: 1,  # Tomato___Early_blight
-    17: 2,  # Tomato___Late_blight
-    18: 3,  # Tomato___Leaf_Mold
-    19: 4,  # Tomato___Septoria_leaf_spot
-    20: 5,  # Tomato___Spider_mites
-    21: 6,  # Tomato___Target_Spot
-    22: 7,  # Tomato___Tomato_Yellow_Leaf_Curl_Virus
-    23: 8,  # Tomato___Tomato_mosaic_virus
-    24: 9,  # Tomato___healthy
-    25: 0,  # Additional tomato classes that might be mapped to the same diseases
-    26: 1,
-    27: 2,
-    28: 3,
-    29: 4,
-    30: 5,
-    31: 6,
-    32: 7,
-    33: 8,
-    34: 9,
-    36: 9
-}
+    logger.error(f"Failed to initialize plant disease model: {e}")
+    plant_disease_model = None
 
 # Routes
 @app.route('/')
@@ -198,24 +110,11 @@ class ChatAPI(Resource):
             )
 
             bot_response = chat_completion.choices[0].message.content
-            logger.info(f"Response from Groq: {bot_response[:100]}...")
-
-            return {"response": bot_response}
+            return {"response": bot_response}, 200
 
         except Exception as e:
-            logger.error(f"Error contacting Groq API or processing request: {e}", exc_info=True)
-            
-            # Include Groq error details if available
-            error_message = str(e)
-            if hasattr(e, 'response') and e.response is not None and hasattr(e.response, 'json'):
-                try:
-                    error_detail = e.response.json()
-                    if isinstance(error_detail, dict) and 'error' in error_detail:
-                        error_message = f"{str(e)} - Detail: {error_detail['error']}"
-                except:
-                    pass
-                    
-            return {"error": f"Sorry, an internal error occurred: {error_message}"}, 500
+            logger.error(f"Error in chat endpoint: {e}", exc_info=True)
+            return {"error": str(e)}, 500
 
 @disease_ns.route('/detect')
 class DiseaseDetectionAPI(Resource):
@@ -225,45 +124,57 @@ class DiseaseDetectionAPI(Resource):
     @disease_ns.response(400, 'Validation Error', error_response)
     @disease_ns.response(500, 'Server Error', error_response)
     def post(self):
-        """Detect diseases in tomato plant images using local model"""
-        # Check if model is loaded
-        if not model:
-            logger.error("Disease detection model not loaded")
-            return {"error": "Disease detection model not available."}, 500
-        
+        """Detect plant disease from base64 encoded image"""
+        if not plant_disease_model:
+            return {"error": "Plant disease model not initialized"}, 500
+        if not groq_client:
+            return {"error": "Groq client not initialized. Check your API Key."}, 500
+
         try:
-            # Process image from request
-            try:
-                image_bytes = process_image_data(request.json if request.is_json else {})
-            except ValueError as img_err:
-                logger.error(f"Error processing image: {img_err}")
-                return {"error": str(img_err)}, 400
+            # Get image data from request
+            data = request.json
+            if not data or 'image' not in data:
+                return {"error": "No image data provided"}, 400
+
+            # Process image data
+            image_bytes = process_image_data(data['image'])
+            if not image_bytes:
+                return {"error": "Invalid image data"}, 400
+
+            # Make prediction
+            result = plant_disease_model.predict(image_bytes)
             
-            # Preprocess image for model input
-            image_array = preprocess_image(image_bytes)
+            # Get LLM information about the disease
+            if result and 'prediction' in result:
+                try:
+                    disease_name = result['prediction']
+                    messages = create_disease_info_prompt(disease_name)
+                    
+                    # Send request to Groq API
+                    logger.info(f"Requesting LLM info for disease: {disease_name}")
+                    chat_completion = groq_client.chat.completions.create(
+                        messages=messages,
+                        model="llama3-8b-8192",
+                        temperature=0.7,
+                        max_tokens=1024,
+                        top_p=1,
+                        stop=None,
+                        stream=False,
+                    )
+                    
+                    # Extract response and add to result
+                    llm_info = chat_completion.choices[0].message.content
+                    logger.info(f"Generated LLM info for {disease_name}: {llm_info[:50]}...")
+                    result['llmInfo'] = llm_info
+                except Exception as llm_err:
+                    logger.error(f"Error generating LLM information: {llm_err}")
+                    result['llmInfoError'] = "Failed to generate disease information"
             
-            # Predict tomato disease
-            predicted_class_name, confidence = predict_tomato_disease(model, image_array)
-            
-            # Handle prediction results
-            if not predicted_class_name:
-                return {"error": "Unable to classify the image. Please provide a clear tomato plant image."}, 400
-            
-            # Create result with the predicted class
-            result = [{
-                "label": predicted_class_name,
-                "score": confidence
-            }]
-            
-            # Add disease descriptions and treatments
-            result = enrich_disease_data(result)
-            
-            logger.info(f"Successfully processed tomato disease detection: {predicted_class_name}")
-            return {"prediction": result}
-            
+            return result, 200
+
         except Exception as e:
-            logger.error(f"Unhandled error in disease detection: {e}", exc_info=True)
-            return {"error": f"Sorry, an error occurred: {str(e)}"}, 500
+            logger.error(f"Error in disease detection: {e}", exc_info=True)
+            return {"error": str(e)}, 500
 
 @disease_ns.route('/detect-file')
 class DiseaseDetectionFileAPI(Resource):
@@ -273,61 +184,43 @@ class DiseaseDetectionFileAPI(Resource):
     @disease_ns.response(400, 'Validation Error', error_response)
     @disease_ns.response(500, 'Server Error', error_response)
     def post(self):
-        """Detect diseases in tomato plant images using local model (file upload)"""
-        # Check if model is loaded
-        if not model:
-            logger.error("Disease detection model not loaded")
-            return {"error": "Disease detection model not available."}, 500
-        
+        """Detect plant disease from uploaded image file"""
+        if not plant_disease_model:
+            return {"error": "Plant disease model not initialized"}, 500
+
         try:
-            # Process image from request
-            try:
-                if 'image' not in request.files:
-                    return {"error": "No image file provided"}, 400
-                    
-                image_file = request.files['image']
-                image_bytes = image_file.read()
-                
-                if not image_bytes:
-                    return {"error": "Empty image file"}, 400
-                
-            except Exception as img_err:
-                logger.error(f"Error processing image file: {img_err}")
-                return {"error": str(img_err)}, 400
+            # Get image file from request
+            if 'image' not in request.files:
+                return {"error": "No image file provided"}, 400
+
+            image_file = request.files['image']
+            if not image_file:
+                return {"error": "Empty image file"}, 400
+
+            # Read image file
+            image_bytes = image_file.read()
+            if not image_bytes:
+                return {"error": "Could not read image file"}, 400
+
+            # Make prediction
+            result = plant_disease_model.predict(image_bytes)
             
-            # Preprocess image for model input
-            image_array = preprocess_image(image_bytes)
+            # Enrich the result with additional disease information
+            enriched_result = enrich_disease_data(result)
             
-            # Predict tomato disease
-            predicted_class_name, confidence = predict_tomato_disease(model, image_array)
-            
-            # Handle prediction results
-            if not predicted_class_name:
-                return {"error": "Unable to classify the image. Please provide a clear tomato plant image."}, 400
-            
-            # Create result with the predicted class
-            result = [{
-                "label": predicted_class_name,
-                "score": confidence
-            }]
-            
-            # Add disease descriptions and treatments
-            result = enrich_disease_data(result)
-            
-            logger.info(f"Successfully processed tomato disease detection: {predicted_class_name}")
-            return {"prediction": result}
-            
+            return enriched_result, 200
+
         except Exception as e:
-            logger.error(f"Unhandled error in disease detection: {e}", exc_info=True)
-            return {"error": f"Sorry, an error occurred: {str(e)}"}, 500
+            logger.error(f"Error in disease detection from file: {e}", exc_info=True)
+            return {"error": str(e)}, 500
 
 @general_ns.route('/test')
 class TestAPI(Resource):
     @general_ns.doc('test_api')
     @general_ns.response(200, 'Success', test_response)
     def get(self):
-        """Test if the API is running properly"""
-        return {"status": "success"}
+        """Test the API health"""
+        return {"status": "healthy", "message": "API is running"}, 200
 
 # Legacy routes for backward compatibility
 @app.route('/chat', methods=['POST', 'OPTIONS'])
@@ -403,4 +296,4 @@ def test_endpoint():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    app.run(debug=True, host='0.0.0.0', port=5000) 
