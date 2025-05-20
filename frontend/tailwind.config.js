@@ -1,19 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{html,js}"
+    './src/**/*.{vue,js,ts,jsx,tsx,html}',
+    './public/**/*.html',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        'poppins': ['Poppins', 'sans-serif']
+        'poppins': ['Poppins', 'sans-serif'],
       },
       colors: {
-        'agrobot-bg': '#f5f5f5',
-        'agrobot-green-light': '#e9f5e9',
-        'agrobot-blue-light': '#e3f2fd'
-      }
+        'agrobot-bg': 'var(--agrobot-bg)',
+        'agrobot-dark-bg': 'var(--agrobot-dark-bg)',
+        'agrobot-dark-card': 'var(--agrobot-dark-card)',
+        'agrobot-dark-text': 'var(--agrobot-dark-text)',
+      },
     },
   },
   plugins: [],
-}; 
+} 

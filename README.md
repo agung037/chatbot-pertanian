@@ -1,181 +1,164 @@
-# AgroBot - Agricultural Assistant
+# AgroBot - Tomato Disease Detection and Farm Assistant
 
-## Demo
-![AgroBot Demo](demo2.gif)
-
-
-AgroBot is an AI-powered agricultural assistant designed to help farmers, agricultural professionals, and farming enthusiasts with agricultural-related questions and plant disease detection.
+A comprehensive web application for tomato farmers to detect plant diseases and get cultivation advice.
 
 ## Features
 
-### AI Chatbot Assistant
-- Real-time chat interface with an AI assistant specialized in agricultural topics
-- Persistent chat history using localStorage
-- Responsive design for desktop and mobile devices
+- **Disease Detection**: Upload an image to identify tomato plant diseases
+- **AI Chat Assistant**: Get expert advice on tomato cultivation
+- **Forum**: Connect with other farmers to share knowledge and experiences
+- **Dashboard**: View analytics and statistics
 
-### Tomato Disease Detection
-- Image-based disease detection using machine learning
-- Upload images via drag-and-drop or file selection
-- Detailed disease classification with confidence percentages
-- Disease information and treatment recommendations in English
-- **NEW:** Comprehensive disease information in Indonesian language using LLM
+## Project Architecture
 
-### Forum Discussions
-- Community forum for agricultural discussions
-- Ask questions and share knowledge with other farmers
+### Backend (Flask)
 
-### Knowledge Base
-- Dashboard with agricultural information and best practices
-- Searchable resources for common farming issues
+The backend is built using Flask with a modular architecture:
 
-## Tech Stack
+- **Application Factory Pattern**: Centralized app configuration and initialization
+- **Blueprints**: Organized routes by feature
+- **Service Layer**: Separation of business logic from routes
+- **Dependency Injection**: Services are loosely coupled for better testability
+- **Configuration Management**: Environment-specific configurations
+
+#### Directory Structure
+
+```
+backend/
+├── app.py                 # Application factory and entry point
+├── wsgi.py                # WSGI entry point for production
+├── config.py              # Configuration settings
+├── requirements.txt       # Dependencies
+├── models/                # ML model implementations
+│   ├── __init__.py
+│   └── plant_disease_model.py
+├── routes/                # API routes organized by feature
+│   ├── __init__.py
+│   ├── chat.py
+│   ├── disease.py
+│   └── general.py
+├── services/              # Business logic and external services
+│   ├── __init__.py
+│   ├── disease_service.py
+│   ├── llm_service.py
+│   └── service_registry.py
+└── utils/                 # Utility functions and helpers
+    ├── __init__.py
+    ├── api.py
+    ├── disease_data.py
+    ├── image_processing.py
+    ├── llm.py
+    ├── model_prediction.py
+    └── swagger.py
+```
 
 ### Frontend
-- HTML5, CSS3, JavaScript
-- TailwindCSS for styling
-- Webpack for bundling
-- jQuery for DOM manipulation
-- Responsive design across devices
 
-### Backend
-- Python with Flask web framework
-- RESTful API with Flask-RESTX and Swagger documentation
-- CORS support for cross-origin requests
+The frontend uses HTML, CSS (TailwindCSS), and JavaScript:
 
-### AI and Machine Learning
-- Groq API integration with Llama3-8b-8192 model for chatbot
-- HuggingFace API for disease detection (MobileNet model)
-- LLM-generated content in multiple languages
+- **Webpack**: For bundling and optimization
+- **TailwindCSS**: For styling
+- **Modular JavaScript**: Organized by feature
 
-## Installation and Setup
+## Getting Started
 
 ### Prerequisites
-- Python 3.8+ installed
-- Node.js v16+ and npm v8+ (for frontend development)
-- API keys from Groq and HuggingFace
-- Git for cloning the repository
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/agung037/chatbot-pertanian.git
-cd chatbot-pertanian
-```
+- Python 3.8+
+- Node.js 14+
+- API keys (see `.env.example`)
 
-### Step 2: Backend Setup
+### Installation
 
-#### Set Up Python Environment
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/chatbot-pertanian.git
+   cd chatbot-pertanian
+   ```
 
-#### Install Backend Dependencies
-```bash
-cd backend
-pip install -r requirements.txt
-```
+2. Set up the backend:
+   ```
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-#### Configure API Keys
-Create a `.env` file in the backend directory with your API keys:
-```
-GROQ_API_KEY=your_groq_api_key_here
-HUGGINGFACE_API_KEY=your_huggingface_api_key_here
-```
+3. Create a `.env` file in the backend directory with your API keys:
+   ```
+   GROQ_API_KEY=your_groq_api_key
+   HUGGINGFACE_API_KEY=your_huggingface_api_key
+   FLASK_ENV=development
+   ```
 
-#### Run the Backend
-```bash
-python app.py
-```
-The Flask server will run at `http://127.0.0.1:5000`
+4. Set up the frontend:
+   ```
+   cd ../frontend
+   npm install
+   ```
 
-### Step 3: Frontend Setup (for Development)
+### Running the Application
 
-#### Install Frontend Dependencies
-```bash
-cd frontend
-npm install
-```
+1. Start the backend:
+   ```
+   cd backend
+   python app.py
+   ```
 
-#### Run Frontend Development Server
-```bash
-npm start
-```
-This will start a development server at `http://localhost:9000` with hot reloading.
+2. Start the frontend development server:
+   ```
+   cd frontend
+   npm run dev
+   ```
 
-#### Build Frontend for Production
-```bash
-npm run build
-```
-The built files will be in the `dist` directory.
-
-### Step 4: Access the Web Interface
-Using the pre-built frontend:
-- Open your browser and navigate to `http://127.0.0.1:5000`
-
-When using the frontend development server:
-- Open your browser and navigate to `http://localhost:9000`
+3. Open your browser and navigate to `http://localhost:9001`
 
 ## API Endpoints
 
-### Chat Endpoints
-- `POST /chat`: Send messages to the AI assistant
-  - Request: `{ "message": "your question here" }`
-  - Response: `{ "response": "AI assistant's answer" }`
+The API is organized around RESTful principles:
 
-### Disease Detection Endpoints
-- `POST /detect-disease`: Detect diseases in plant images
-  - Request: `{ "image": "base64_encoded_image", "requestLlmInfo": true }`
-  - Response: Contains disease prediction, confidence score, and LLM-generated information
+- **Chat API**: `/api/chat`
+  - `POST /`: Send a message to the chatbot
+  - `GET /health`: Check chat service availability
 
-### Other Endpoints
-- `GET /test`: Test if the API is running
-- Swagger UI available at `/docs` for interactive API documentation
+- **Disease Detection API**: `/api/disease`
+  - `POST /detect`: Detect disease from base64 image
+  - `POST /detect-file`: Detect disease from uploaded file
+  - `GET /health`: Check disease detection service availability
 
-## Usage Instructions
+- **General API**: 
+  - `GET /`: Serve the main page
+  - `GET /api/health`: Overall API health check
+  - `GET /api/test`: Simple test endpoint
 
-### Chatbot Assistant
-1. Navigate to the AI Assistant page
-2. Type your agricultural question in the chat input
-3. Receive expert advice in Indonesian language
+### Swagger Documentation
 
-### Disease Detection
-1. Go to the Disease Detection page
-2. Upload a tomato leaf image
-3. Click "Detect Disease"
-4. View the classification results with confidence scores
-5. Read detailed information about the disease, including:
-   - English description and treatment options
-   - Comprehensive Indonesian information about symptoms, causes, and treatments
+The API includes Swagger documentation for easy exploration and testing:
 
-## Troubleshooting
+- Access Swagger UI at: `http://localhost:5012/docs`
+- Alternative access via: `http://localhost:5012/swagger`
 
-- If you see a "Model is loading" message, wait a few seconds and try again
-- Ensure images are clear and well-lit for accurate detection
-- Make sure your API keys are correctly configured
-- Check that you're using a supported image format (JPG, PNG)
-- For frontend development issues, check the webpack.config.js and package.json for correct configurations
+The Swagger UI provides:
+- Interactive documentation for all API endpoints
+- Request/response models and schemas
+- Testing interface to make API calls directly from the browser
+- Authentication requirements and error handling information
 
-## Project Structure
+### OpenAPI Specification
+
+The OpenAPI specification for the API can be accessed at:
+- `http://localhost:5012/swagger.json`
+
+This JSON file contains the complete API specification that can be imported into tools like Postman, Insomnia, or other API development environments.
+
+## Deployment
+
+The application can be deployed using Gunicorn for the backend:
+
 ```
-chatbot-pertanian/
-├── backend/
-│   ├── app.py                # Main Flask application
-│   ├── requirements.txt      # Python dependencies
-│   └── utils/                # Utility modules
-├── frontend/
-│   ├── src/                  # Source files
-│   │   ├── index.html        # Chat interface
-│   │   ├── dashboard.html    # Dashboard page
-│   │   ├── detection.html    # Disease detection page
-│   │   ├── forum.html        # Community forum
-│   │   └── ...
-│   └── package.json          # Frontend dependencies and scripts
-└── README.md                 # This file
+cd backend
+gunicorn wsgi:application
 ```
-
-## Contributing
-
-Contributions are welcome! Feel free to submit issues and pull requests.
 
 ## License
 

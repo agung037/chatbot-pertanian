@@ -15,26 +15,24 @@ def process_image_data(request_data):
         logger.info(f"Successfully read image file, size: {len(image_bytes)} bytes")
         return image_bytes
     
-    elif 'image' in request_data:
-        logger.info("Processing image from base64 data")
-        image_data = request_data.get('image', '')
-        if not image_data:
-            raise ValueError("Empty image data")
-            
-        if image_data.startswith('data:image'):
-            image_data = image_data.split(',')[1]
-            
-        try:
-            image_bytes = base64.b64decode(image_data)
-            if not image_bytes:
-                raise ValueError("Invalid base64 image data")
-            logger.info(f"Successfully decoded base64 image, size: {len(image_bytes)} bytes")
-            return image_bytes
-        except Exception as decode_err:
-            logger.error(f"Error decoding base64 image: {decode_err}")
-            raise ValueError(f"Failed to decode image: {str(decode_err)}")
+    # Handle both dictionary and string inputs
+    image_data = request_data if isinstance(request_data, str) else request_data.get('image', '')
     
-    raise ValueError("No image provided in request")
+    if not image_data:
+        raise ValueError("Empty image data")
+        
+    if image_data.startswith('data:image'):
+        image_data = image_data.split(',')[1]
+        
+    try:
+        image_bytes = base64.b64decode(image_data)
+        if not image_bytes:
+            raise ValueError("Invalid base64 image data")
+        logger.info(f"Successfully decoded base64 image, size: {len(image_bytes)} bytes")
+        return image_bytes
+    except Exception as decode_err:
+        logger.error(f"Error decoding base64 image: {decode_err}")
+        raise ValueError(f"Failed to decode image: {str(decode_err)}")
 
 def detect_image_format(image_bytes):
     """Detect image format and return appropriate content type"""
