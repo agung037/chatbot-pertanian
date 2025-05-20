@@ -19,6 +19,8 @@ class LLMService:
                 logger.warning("No API key provided for LLM service")
                 self.client = None
             else:
+                # Initialize Groq client with only the API key - no additional parameters
+                # This is compatible with newer versions of the groq library
                 self.client = Groq(api_key=api_key)
                 logger.info("LLM service initialized successfully")
                 
